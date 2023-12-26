@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Chat App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+  <script src="script.js?v=1"></script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    ::-webkit-scrollbar {
+      width: 2px;
+      height: 70%;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: #bdbdbd;
+    }
+
+    body {
+      background-color: #f0f3f5;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      max-height: 100vh;
+    }
+
+    .chat-box {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      height: 70vh;
+      margin: 50px auto;
+      overflow-y: scroll;
+      padding: 20px;
+      width: 80vw;
+
+    }
+
+    p {
+
+      white-space: pre-wrap;
+
+    }
+
+    .message-container {
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .sender-name {
+      color: #008080;
+      font-size: 16px;
+      margin: 0 0 5px 0;
+    }
+
+    .message {
+      color: #333;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .input-container {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      margin: 0 auto;
+      padding: 10px;
+      width: 80%;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 50px;
+    }
+
+    .input {
+      background-color: transparent;
+      border: none;
+      color: #333;
+      height: 2vh;
+      flex: 1;
+      font-size: 14px;
+      margin-right: 10px;
+      outline: none;
+
+    }
+
+    .send-button {
+      background-color: #008080;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 5px 10px;
+    }
+
+    .replyto-container {
+      background-image: linear-gradient(-45deg, #499797, #6fbbbb);
+
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 12px;
+
+    }
+
+    .replyto-containerp {
+      background-image: linear-gradient(-45deg, #499797, #6fbbbb);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin: 0;
+      padding: 10px;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+
+    }
+
+    .replyButton {
+
+      border: none;
+      color: white;
+      padding: 5px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .replyButton i {
+      font-size: 17px;
+      color: #bdbdbd;
+      cursor: pointer;
+    }
+
+    .cancel {
+      background-color: white;
+      color: #6fbbbb;
+      border: none;
+      border-radius: 10px;
+      margin-right: 10px;
+    }
+
+    .rs {
+      flex: 1;
+      width: 80%;
+      margin: 0;
+
+
+    }
+    pre {
+      background-image: linear-gradient(-45deg, #499797, #6fbbbb);
+      color: white;
+      padding: 5px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-box"></div>
+  <div class="rs"></div>
+  <div class="input-container">
+    <textarea type="text" class="input" placeholder="Type your message here"></textarea>
+    <button class="send-button">Send</button>
+  </div>
+  <script>
+    if (!localStorage.getItem('senderName')) {
+      localStorage.setItem('senderName', prompt('Enter your name:'));
+
+    }
+
+    async function botreply(message) {
+      try {
+        // Using the fetch API to send a GET request to the server
+        const response = await fetch(`/message?username=shuddho&message=${encodeURIComponent(message)}`);
+
+        // Checking if the request was successful (status code 200)
+        if (response.ok) {
+          const result = await response.json(); // Assuming the server returns JSON
+          console.log(result); // Log the result from the server
+          sendMessage(result.message, 'default', 'System Bot');
+        } else {
+          console.error('Error:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    }
+
+    function autoscroll() {
+      const chatBox = document.querySelector(".chat-box");
+
+      // Calculate the difference between maximum and current scroll position
+      const scrollDifference = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
+
+      // Check if the user is close to the bottom (you can adjust the threshold as needed)
+      if (scrollDifference > 400) {
+        return;
+      }
+
+      // Scroll to the bottom
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    let replyMessageID = null;
+
+    function addMessage(message, senderName, replyto, timestamp=undefined) {
+      if (message.trim() == '') {
+
+        return;
+      }
+      const chatBox = document.querySelector(".chat-box");
+      const messageContainer = document.createElement("div");
+      messageContainer.classList.add("message-container");
+      if (replyto) {
+
+        messageContainer.setAttribute("replyto", replyMessageID);
+        const replytoContainer = document.createElement("div");
+        replytoContainer.classList.add("replyto-container");
+        replytoContainer.textContent = replyto;
+        messageContainer.appendChild(replytoContainer);
+
+        replyMessageID = null;
+      }
+      else if (replyMessageID) {
+        messageContainer.setAttribute("replyto", replyMessageID);
+        const replytoContainer = document.createElement("div");
+        replytoContainer.classList.add("replyto-container");
+        replytoContainer.textContent = document.querySelector(`[messageID='${replyMessageID}'] .message`).textContent;
+        messageContainer.appendChild(replytoContainer);
+
+        replyMessageID = null;
+      }
+      const senderNameElement = document.createElement("h3");
+      senderNameElement.classList.add("sender-name");
+      senderNameElement.textContent = senderName;
+      const messageElement = document.createElement("p");
+      messageElement.classList.add("message");
+      messageElement.innerHTML = message.replace('\n', '\n');
+      const replyIcon = document.createElement("span");
+      replyIcon.classList.add("material-icons-outlined");
+      replyIcon.classList.add("reply-icon");
+      replyIcon.classList.add("replyButton");
+      replyIcon.innerHTML = "<i class=\"fa-solid fa-reply\"></i>"
+      replyIcon.addEventListener("click", () => {
+        replyMessageID = messageContainer.getAttribute("messageID");
+        console.log('ID' + replyMessageID)
+        messageContainer.setAttribute("replyto", replyMessageID);
+        const replytoContainer = document.createElement("div");
+        replytoContainer.classList.add("replyto-containerp");
+        replytoContainer.textContent = document.querySelector(`[messageID='${replyMessageID}'] .sender-name`).textContent + ' : ' + document.querySelector(`[messageID='${replyMessageID}'] .message`).textContent;
+        let inputcontainer = document.querySelector(".rs");
+        inputcontainer.innerHTML = ""
+        let cancelButton = document.createElement("button");
+        cancelButton.textContent = "Cancel";
+        cancelButton.classList.add("cancel");
+        cancelButton.addEventListener("click", () => {
+          // Remove reply-related elements when Cancel button is clicked
+          inputcontainer.innerHTML = "";
+          replyMessageID = null;
+        });
+        replytoContainer.insertBefore(cancelButton, replytoContainer.firstChild);
+        inputcontainer.insertBefore(replytoContainer, input.firstChild);
+
+      });
+      messageContainer.appendChild(senderNameElement);
+      messageContainer.appendChild(messageElement);
+      messageContainer.appendChild(replyIcon);
+      messageContainer.setAttribute("messageID", timestamp || Date.now());
+
+      chatBox.appendChild(messageContainer);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      document.querySelector('.rs').innerHTML = "";
+      replyMessageID = null;
+    }
+
+
+
+
+    const input = document.querySelector(".input");
+    const sendButton = document.querySelector(".send-button");
+    const senderName = localStorage.getItem("senderName");
+
+    sendButton.addEventListener("click", async () => {
+      sendMessage()
+      const message = input.value;
+      addMessage(message, senderName)
+      input.value = "";
+      await botreply(message)
+
+      autoscroll()
+    });
+
+
+    input.addEventListener("keydown", async (event) => {
+      console.log("Shift key pressed:", event.shiftKey);
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault()
+        sendMessage()
+        const message = input.value;
+        addMessage(message, senderName)
+        input.value = "";
+        await botreply(message)
+
+        autoscroll()
+      }
+
+    });
+
+ function sus() {
+      var mdBlocks = document.querySelectorAll('p');
+      var converter = new showdown.Converter();
+
+      mdBlocks.forEach(function (mdBlock) {
+        var markdownContent = mdBlock.innerHTML.trim();
+        var htmlContent = converter.makeHtml(markdownContent);
+        mdBlock.innerHTML = htmlContent;
+      });
+    }
+    const jsoncompile = (data) => {
+      console.log(data)
+
+      // loop through the data
+      for (let i = 0; i < data.length; i++) {
+        replyMessageID = data[i].replyto
+        addMessage(data[i].message, data[i].name, data[i].replymessage, data[i].timestamp)
+        replyMessageID = null
+        sus()
+      }
+
+    }
+
+    setInterval(() => {
+      // fetch /getMessage and check if it is same as the html of the chat-box tag's inner html
+      // if not, add the new message
+      // if yes, do nothing
+
+      const chatBox = document.querySelector(".chat-box");
+      const html = chatBox.innerHTML;
+
+      fetch('/getMessageRaw?id=' + 'default')
+        .then(response => response.json())
+        .then(data => {
+          try {
+            const lastMessageID = chatBox.lastElementChild.getAttribute("messageID");
+            console.log(lastMessageID)
+            console.log(data[data.length-1].timestamp)
+            if (data[data.length-1].timestamp == lastMessageID) {
+return
+              
+
+            }
+            else{
+              jsoncompile(data)
+            }
+          }
+          catch (e) {
+            jsoncompile(data)
+          }
+          //get the last messageID from the chatbox
+
+        })
+    }, 1000);
+
+
+
+    const sendMessage = (message = document.querySelector(".input").value, id = 'default', name = localStorage.getItem("senderName")) => {
+
+      messagedata = {}
+      messagedata.name = name
+      messagedata.message = message
+      messagedata.replyto = replyMessageID
+      messagedata.timestamp = Date.now()
+
+      fetch('/sendMessage?id=' + 'default' + '&message=' + encodeURIComponent(JSON.stringify(messagedata)))
+        .then(response => response.json())
+        .then(data => {
+
+
+          if (data.success == true) {
+            console.log('ok')
+
+          }
+        })
+
+
+
+    }
+
+  </script>
+</body>
+
+</html>

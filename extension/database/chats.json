@@ -1,0 +1,52 @@
+{
+    "default": [
+        {
+            "name": "shuddho",
+            "message": "```py\nimport sus\n```",
+            "replyto": null,
+            "timestamp": 1703502584187
+        },
+        {
+            "name": "System Bot",
+            "message": "It looks like you've attempted to import a module named \"sus\" in Python. If you intended to use a specific module, make sure to use the correct module name. If you have any questions or need help with anything related to Python, feel free to ask!",
+            "replyto": null,
+            "timestamp": 1703502587526
+        },
+        {
+            "name": "shuddho",
+            "message": "make me a for loop in python",
+            "replyto": null,
+            "timestamp": 1703502726936
+        },
+        {
+            "name": "System Bot",
+            "message": "Sure! Here's an example of a for loop in Python:\n\n```python\n# This loop will iterate through the elements in the list and print each element\nmy_list = [1, 2, 3, 4, 5]\nfor item in my_list:\n    print(item)\n```\n\nIn this example, the for loop iterates through each item in the list \"my_list\" and prints the value of each item.",
+            "replyto": null,
+            "timestamp": 1703502729980
+        },
+        {
+            "name": "shuddho",
+            "message": "thank you!",
+            "replyto": "1703502729980",
+            "timestamp": 1703502769411
+        },
+        {
+            "name": "System Bot",
+            "message": "You're welcome! If you have any more questions or need further assistance, feel free to ask. I'm here to help!",
+            "replyto": null,
+            "timestamp": 1703502772339
+        },
+        {
+            "name": "shuddho",
+            "message": "hi",
+            "replyto": null,
+            "timestamp": 1703503907933
+        },
+        {
+            "name": "System Bot",
+            "message": "Hello! How can I assist you today? If you have any questions or need help with something, feel free to ask.",
+            "replyto": null,
+            "timestamp": 1703503910345
+        }
+    ]
+}
