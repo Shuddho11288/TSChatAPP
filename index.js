@@ -21,7 +21,7 @@ app.get('/default', (req, res) => {
     
     )
 
-const port = 3000
+const port = 8000
 
 // Make a get request that takes two parameters. 1. username,2.message. Then sends a reply to the sender
 app.get('/message', async (req, res) => {
