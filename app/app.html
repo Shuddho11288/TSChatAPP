@@ -219,7 +219,7 @@
       }
     }
 
-    function autoscroll() {
+    async function autoscroll() {
       const chatBox = document.querySelector(".chat-box");
 
       // Calculate the difference between maximum and current scroll position
@@ -348,7 +348,7 @@
         mdBlock.innerHTML = htmlContent;
       });
     }
-    const jsoncompile = (data) => {
+    const jsoncompile = async (data) => {
       console.log(data)
 
       // loop through the data
@@ -370,8 +370,8 @@
       const html = chatBox.innerHTML;
 
       fetch('/getMessageRaw?id=' + 'default')
-        .then(response => response.json())
-        .then(data => {
+        .then(async response => response.json())
+        .then(async data => {
           try {
             const lastMessageID = chatBox.lastElementChild.getAttribute("messageID");
             console.log(lastMessageID)
@@ -395,7 +395,7 @@ return
 
 
 
-    const sendMessage = (message = document.querySelector(".input").value, id = 'default', name = localStorage.getItem("senderName")) => {
+    const sendMessage = async (message = document.querySelector(".input").value, id = 'default', name = localStorage.getItem("senderName")) => {
 
       messagedata = {}
       messagedata.name = name
@@ -404,8 +404,8 @@ return
       messagedata.timestamp = Date.now()
 
       fetch('/sendMessage?id=' + 'default' + '&message=' + encodeURIComponent(JSON.stringify(messagedata)))
-        .then(response => response.json())
-        .then(data => {
+        .then(async response => response.json())
+        .then(async data => {
 
 
           if (data.success == true) {
